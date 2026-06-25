@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OCHE Resource Repository — Stanford Medicine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cardinal: #8C1515; --cardinal-dark: #620000; --cardinal-light: #F9EDED;
+  --black: #1A1A1A; --dark-gray: #2C2C2C; --gray-700: #444;
+  --gray-500: #717171; --gray-200: #E5E5E5; --gray-100: #F2F2F0; --white: #fff;
+  --radius: 8px; --radius-sm: 4px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Source Sans 3', sans-serif; color: var(--black); background: var(--gray-100); font-size: 15px; line-height: 1.6; }
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: var(--black); padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between; height: 42px;
+}
+.top-bar-left { display: flex; align-items: center; gap: 6px; }
+.top-bar-logo { cursor: pointer; }
+.top-bar-logo img { height: 26px; width: auto; display: block; }
+.top-bar-right { display: flex; align-items: center; gap: 8px; }
+.lang-wrapper { position: relative; }
+.lang-btn {
+  font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.8);
+  cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: all 0.15s;
+}
+.lang-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); color: #fff; }
+.lang-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius);
+  padding: 6px; min-width: 150px; box-shadow: 0 6px 24px rgba(0,0,0,0.15); z-index: 400;
+}
+.lang-dropdown.open { display: block; }
+.lang-option {
+  padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px;
+  color: var(--black); display: flex; align-items: center; justify-content: space-between; transition: background 0.1s;
+}
+.lang-option:hover { background: var(--gray-100); }
+.lang-option.selected { color: var(--cardinal); font-weight: 600; }
+
+/* ── MAIN NAV ── */
+nav {
+  background: var(--dark-gray); position: sticky; top: 0; z-index: 300;
+  display: flex; align-items: stretch; height: 48px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.nav-home-btn {
+  display: flex; align-items: center; padding: 0 1.5rem;
+  background: var(--cardinal-dark); border: none; cursor: pointer;
+  color: #fff; font-family: 'Source Sans 3', sans-serif;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  transition: background 0.15s; white-space: nowrap;
+}
+.nav-home-btn:hover { background: var(--cardinal); }
+.nav-home-btn.active { background: var(--cardinal); }
+
+.nav-items { display: flex; align-items: stretch; flex: 1; justify-content: flex-end; padding-right: 1rem; }
+
+/* dropdown trigger */
+.nav-item { position: relative; display: flex; align-items: stretch; }
+.nav-item-btn {
+  display: flex; align-items: center; gap: 5px; padding: 0 1.1rem;
+  background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8);
+  font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 500;
+  transition: background 0.15s, color 0.15s; white-space: nowrap;
+}
+.nav-item-btn:hover, .nav-item-btn.active { background: var(--cardinal); color: #fff; }
+.nav-arrow { font-size: 10px; opacity: 0.6; transition: transform 0.2s; }
+.nav-item:hover .nav-arrow { transform: rotate(180deg); }
+
+/* dropdown menu */
+.nav-dropdown {
+  display: none; position: absolute; top: 100%; left: 0;
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-top: 3px solid var(--cardinal); min-width: 220px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12); z-index: 500;
+}
+.nav-item:hover .nav-dropdown { display: block; }
+.dropdown-header {
+  padding: 10px 16px 8px; font-size: 13px; font-weight: 700;
+  color: var(--cardinal-dark); border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+}
+.dropdown-header:hover { color: var(--cardinal); }
+.dropdown-link {
+  display: flex; align-items: center; gap: 8px; padding: 9px 16px;
+  font-size: 13px; color: var(--gray-700); cursor: pointer;
+  transition: background 0.1s, color 0.1s; border-bottom: 1px solid var(--gray-100);
+}
+.dropdown-link:last-child { border-bottom: none; }
+.dropdown-link:hover { background: var(--cardinal-light); color: var(--cardinal-dark); }
+.dropdown-icon { font-size: 14px; }
+.dropdown-sub { font-size: 11px; color: var(--gray-500); display: block; margin-top: 1px; }
+
+.nav-right-items { display: flex; align-items: center; padding: 0 1rem; gap: 6px; margin-left: auto; }
+.nav-contact-btn {
+  font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.35); background: transparent; color: rgba(255,255,255,0.85);
+  cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: all 0.15s;
+}
+.nav-contact-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); color: #fff; }
+
+/* SCREENS */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── HERO ── */
+.hero { position: relative; height: 520px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(120,30,30,0.88) 0%, rgba(160,50,50,0.70) 50%, rgba(80,15,15,0.75) 100%); }
+.hero-content { position: relative; z-index: 2; padding: 0 2rem; max-width: 700px; text-align: center; }
+.hero-eyebrow { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 1rem; font-weight: 600; }
+.hero h1 { font-family: 'Source Serif 4', serif; font-size: clamp(32px, 5vw, 52px); line-height: 1.15; color: #fff; margin-bottom: 1.1rem; font-weight: 600; }
+.hero p { font-size: 17px; color: rgba(255,255,255,0.85); line-height: 1.75; margin-bottom: 2rem; }
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 10px 20px; border-radius: 100px; border: 1px solid var(--gray-200); background: var(--white); cursor: pointer; font-family: 'Source Sans 3', sans-serif; color: var(--black); text-decoration: none; font-weight: 600; transition: all 0.15s; }
+.btn:hover { border-color: var(--cardinal); color: var(--cardinal); }
+.btn-primary { background: var(--cardinal); border-color: var(--cardinal); color: #fff; }
+.btn-primary:hover { background: var(--cardinal-dark); border-color: var(--cardinal-dark); color: #fff; }
+.btn-outline-white { background: transparent; border-color: rgba(255,255,255,0.5); color: #fff; }
+.btn-outline-white:hover { background: rgba(255,255,255,0.1); border-color: #fff; color: #fff; }
+.btn-dark { background: var(--black); border-color: var(--black); color: #fff; }
+.btn-dark:hover { background: var(--dark-gray); border-color: var(--dark-gray); color: #fff; }
+
+/* STATS BAR */
+.stats-bar { background: var(--black); display: flex; justify-content: center; flex-wrap: wrap; }
+.stat-item { padding: 1rem 2.5rem; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); flex: 1; min-width: 130px; }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: 'Source Serif 4', serif; font-size: 26px; font-weight: 600; color: #fff; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+
+/* HOME SECTIONS */
+.home-section { padding: 3rem 2rem; background: var(--white); margin-bottom: 10px; }
+.home-section.gray { background: var(--gray-100); }
+.home-section.dark { background: var(--dark-gray); }
+.section-inner { max-width: 900px; margin: 0 auto; }
+.section-eyebrow { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--cardinal); font-weight: 700; margin-bottom: 0.5rem; }
+.section-eyebrow.light { color: rgba(255,255,255,0.5); }
+.section-heading { font-family: 'Source Serif 4', serif; font-size: 26px; font-weight: 600; color: var(--cardinal-dark); margin-bottom: 0.75rem; }
+.section-heading.light { color: #fff; }
+.section-sub { font-size: 15px; color: var(--gray-500); line-height: 1.7; margin-bottom: 2rem; }
+.section-sub.light { color: rgba(255,255,255,0.65); }
+
+/* ABOUT */
+.about-split { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.about-img { width: 100%; border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+.about-img img { width: 100%; height: 280px; object-fit: cover; display: block; }
+.about-text h2 { font-family: 'Source Serif 4', serif; font-size: 24px; font-weight: 600; color: var(--cardinal-dark); margin-bottom: 0.75rem; }
+.about-text p { font-size: 14px; color: var(--gray-700); line-height: 1.8; margin-bottom: 1rem; }
+
+/* REPO CARDS */
+.repo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.repo-card { background: var(--white); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.5rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; border-top: 3px solid var(--cardinal); }
+.repo-card:hover { border-color: var(--cardinal); box-shadow: 0 4px 20px rgba(0,0,0,0.2); transform: translateY(-2px); }
+.repo-card-icon { font-size: 30px; margin-bottom: 0.75rem; display: block; }
+.repo-card h3 { font-family: 'Source Serif 4', serif; font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 0.5rem; }
+.repo-card p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 1rem; }
+.repo-card-link { font-size: 13px; color: #e8a0a0; font-weight: 600; }
+
+/* CONTACT */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.contact-info h3 { font-family: 'Source Serif 4', serif; font-size: 20px; color: var(--cardinal-dark); margin-bottom: 1rem; }
+.contact-info p { font-size: 14px; color: var(--gray-700); line-height: 1.8; margin-bottom: 1rem; }
+.contact-detail { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0.75rem; font-size: 14px; color: var(--gray-700); }
+.contact-detail .icon { font-size: 18px; flex-shrink: 0; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 13px; font-weight: 600; color: var(--black); margin-bottom: 5px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; font-size: 14px; padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: var(--white); color: var(--black); font-family: 'Source Sans 3', sans-serif; outline: none; transition: border-color 0.15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--cardinal); }
+.form-row textarea { min-height: 100px; resize: vertical; }
+
+/* ── REPOSITORY PAGE ── */
+.repo-layout { display: flex; min-height: calc(100vh - 90px); }
+.sidebar { width: 260px; flex-shrink: 0; background: var(--white); border-right: 1px solid var(--gray-200); padding: 1.5rem 0; position: sticky; top: 90px; height: calc(100vh - 90px); overflow-y: auto; }
+.sidebar-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-500); font-weight: 700; padding: 0 1.25rem 0.75rem; }
+.tree-item { display: flex; align-items: center; gap: 8px; padding: 7px 1.25rem; font-size: 13px; color: var(--gray-700); cursor: pointer; transition: background 0.1s, color 0.1s; user-select: none; }
+.tree-item:hover { background: var(--gray-100); color: var(--black); }
+.tree-item.active { background: var(--cardinal-light); color: var(--cardinal-dark); font-weight: 600; }
+.tree-item.section-header { font-weight: 700; color: var(--black); font-size: 13px; padding-top: 1.25rem; }
+.tree-item.section-header:first-child { padding-top: 0.5rem; }
+.tree-icon { font-size: 14px; flex-shrink: 0; }
+.tree-arrow { margin-left: auto; font-size: 11px; color: var(--gray-500); transition: transform 0.2s; }
+.tree-arrow.open { transform: rotate(90deg); }
+.tree-children { overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
+.tree-children.open { max-height: 1000px; }
+.indent-1 { margin-left: 12px; } .indent-2 { margin-left: 24px; }
+.sidebar-divider { height: 1px; background: var(--gray-200); margin: 0.75rem 0; }
+.repo-main { flex: 1; padding: 2rem; overflow-y: auto; }
+.repo-header { margin-bottom: 1.75rem; }
+.breadcrumb { font-size: 12px; color: var(--gray-500); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb span { cursor: pointer; }
+.breadcrumb span:hover { color: var(--cardinal); text-decoration: underline; }
+.breadcrumb-sep { color: var(--gray-200); }
+.repo-title { font-family: 'Source Serif 4', serif; font-size: 24px; font-weight: 600; color: var(--cardinal-dark); margin-bottom: 4px; }
+.repo-desc { font-size: 14px; color: var(--gray-500); }
+.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.file-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.1rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; display: flex; flex-direction: column; gap: 6px; }
+.file-card:hover { border-color: var(--cardinal); box-shadow: 0 2px 12px rgba(140,21,21,0.08); }
+.file-type { font-size: 20px; }
+.file-name { font-size: 13px; font-weight: 600; color: var(--black); line-height: 1.4; }
+.file-meta { font-size: 11px; color: var(--gray-500); display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.lang-tag { font-size: 10px; padding: 1px 6px; border-radius: 100px; background: var(--gray-100); color: var(--gray-700); font-weight: 600; }
+.lang-tag.es { background: #FFF4E5; color: #7A3B00; }
+.lang-tag.vi { background: #E8F5E9; color: #1B5E20; }
+.lang-tag.en { background: var(--cardinal-light); color: var(--cardinal-dark); }
+.folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.folder-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.1rem; cursor: pointer; transition: border-color 0.15s; display: flex; align-items: center; gap: 10px; }
+.folder-card:hover { border-color: var(--cardinal); }
+.folder-name { font-size: 13px; font-weight: 600; color: var(--black); }
+.folder-count { font-size: 11px; color: var(--gray-500); }
+.section-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-500); font-weight: 700; margin-bottom: 10px; margin-top: 1.5rem; }
+.section-label:first-child { margin-top: 0; }
+
+footer { background: var(--black); color: rgba(255,255,255,0.5); text-align: center; padding: 1.25rem 2rem; font-size: 12px; border-top: 3px solid var(--cardinal-dark); }
+footer strong { color: rgba(255,255,255,0.85); }
+
+@media (max-width: 720px) {
+  .about-split, .contact-grid { grid-template-columns: 1fr; }
+  .repo-layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; top: 0; }
+  .top-bar { padding: 0 1rem; }
+  nav { display: none; }
+  .hero { height: auto; padding: 3rem 1.25rem; }
+  .hero-content { padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR with logo -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div class="top-bar-logo" onclick="showScreen('home')">
+      <img src="Logo.png" alt="Stanford Medicine — Office of Child Health Equity" />
+    </div>
+  </div>
+  <div class="top-bar-right">
+    <div class="lang-wrapper">
+      <button class="lang-btn" onclick="toggleLang()" id="langBtn">🌐 EN ▾</button>
+      <div class="lang-dropdown" id="langMenu">
+        <div class="lang-option selected" onclick="setLang('en')">English ✓</div>
+        <div class="lang-option" onclick="setLang('es')">Español</div>
+        <div class="lang-option" onclick="setLang('vi')">Tiếng Việt</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN NAV with dropdowns -->
+<nav>
+  <button class="nav-home-btn active" id="nl-home" onclick="showScreen('home')">Home</button>
+
+  <div class="nav-items">
+
+    <!-- GENERAL dropdown -->
+    <div class="nav-item">
+      <button class="nav-item-btn" onclick="showScreen('repo'); navTo('general')" id="nl-general">
+        General <span class="nav-arrow">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header" onclick="showScreen('repo'); navTo('general')">General <span>›</span></div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('guardian-advocacy')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Guardian Advocacy</span><span class="dropdown-sub">Includes IEP subfolder</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('iep-folder')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>IEP</span><span class="dropdown-sub">Special Ed Rights · Procedural Safeguards</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('prewritten')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Pre-Written Materials</span><span class="dropdown-sub">Guardian & MD request letters</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('resource-contacts')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Resource Contacts</span><span class="dropdown-sub">IEE providers · Legal resources</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEAL dropdown -->
+    <div class="nav-item">
+      <button class="nav-item-btn" onclick="showScreen('repo'); navTo('heal')" id="nl-heal">
+        HEAL Resources <span class="nav-arrow">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header" onclick="showScreen('repo'); navTo('heal')">HEAL Resources <span>›</span></div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('heal-main')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>General Resources</span><span class="dropdown-sub">IEP books, letters, accommodation guides</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('home-hospital')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Home Hospital</span><span class="dropdown-sub">Letters, placement guides, regulations</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SVP dropdown -->
+    <div class="nav-item">
+      <button class="nav-item-btn" onclick="showScreen('repo'); navTo('svp')" id="nl-svp">
+        Single Ventricle Program <span class="nav-arrow">▾</span>
+      </button>
+      <div class="nav-dropdown">
+        <div class="dropdown-header" onclick="showScreen('repo'); navTo('svp')">Single Ventricle Program <span>›</span></div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('educational-support')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Educational Support</span><span class="dropdown-sub">Special Ed in School System (EN · ES · VI)</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('mental-health-support')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Mental Health Support</span><span class="dropdown-sub">Supporting Your Child's Mental Health (EN · ES · VI)</span></div>
+        </div>
+        <div class="dropdown-link" onclick="showScreen('repo'); navTo('teacher-info')">
+          <span class="dropdown-icon">📂</span>
+          <div><span>Teacher Info</span><span class="dropdown-sub">Going to School with a Heart Problem (EN · ES)</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav-right-items">
+    <button class="nav-contact-btn" onclick="scrollToContact()">Contact us</button>
+  </div>
+</nav>
+
+<!-- ── HOME ── -->
+<div id="screen-home" class="screen active">
+
+  <div class="hero">
+    <img class="hero-img" src="VC_Pediatrics_1200x674.jpg" alt="Stanford Children's Health" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Office of Child Health Equity · Stanford Medicine</div>
+      <h1 id="heroTitle">OCHE Resource Repository</h1>
+      <p id="heroSub">Connecting families, providers, and educators to the resources children with complex medical needs deserve — in English, Spanish, and Vietnamese.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showScreen('repo'); navTo('root')" id="browseBtn">Browse resources →</button>
+        <button class="btn btn-outline-white" onclick="scrollToContact()" id="contactBtn">Contact us</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="home-section">
+    <div class="section-inner">
+      <div class="about-split">
+        <div class="about-img"><img src="images.jpeg" alt="Stanford Medicine Department of Pediatrics" /></div>
+        <div class="about-text">
+          <div class="section-eyebrow">About Us</div>
+          <h2 id="aboutTitle">Bridging medicine and education at Stanford</h2>
+          <p id="aboutText1">The Office of Child Health Equity (OCHE) at Stanford Medicine's Department of Pediatrics is committed to ensuring that every child — regardless of medical complexity, language, or background — can access the educational support they need and deserve.</p>
+          <p id="aboutText2">Our Resource Repository is a centralized hub built for families, clinicians, educators, and discharge planners navigating the intersection of pediatric health and school services.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="home-section" id="contact-section">
+    <div class="section-inner">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <div class="section-eyebrow">Get in touch</div>
+          <h3 id="contactTitle">Contact Us</h3>
+          <p id="contactDesc">Have a question or need help finding the right resource? Our team is here to help families, providers, and educators navigate educational support for children with complex medical needs.</p>
+          <div class="contact-detail"><span class="icon">🏥</span><span>Stanford Children's Health<br/>Department of Pediatrics<br/>Office of Child Health Equity</span></div>
+          <div class="contact-detail"><span class="icon">🌐</span><span>Resources in English, Español & Tiếng Việt</span></div>
+        </div>
+        <div>
+          <div class="form-row"><label>Your name</label><input type="text" placeholder="First and last name" /></div>
+          <div class="form-row"><label>Email or phone</label><input type="text" placeholder="Best way to reach you" /></div>
+          <div class="form-row"><label>Preferred language</label><select><option>English</option><option>Español</option><option>Tiếng Việt</option><option>Other</option></select></div>
+          <div class="form-row"><label>What do you need help with?</label><select><option>IEP / school services</option><option>Getting an evaluation</option><option>Mental health support</option><option>Legal questions</option><option>Single Ventricle Program</option><option>Something else</option></select></div>
+          <div class="form-row"><label>Message (optional)</label><textarea placeholder="Any details that would help us connect you to the right resource..."></textarea></div>
+          <button class="btn btn-primary">Send message →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REPOSITORY ── -->
+<div id="screen-repo" class="screen">
+  <div class="repo-layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">Repository</div>
+      <div class="tree-item section-header" onclick="navTo('general'); toggleTree('tree-general')">
+        <span class="tree-icon">📁</span> General <span class="tree-arrow" id="arrow-general">›</span>
+      </div>
+      <div class="tree-children" id="tree-general">
+        <div class="tree-item" onclick="navTo('guardian-advocacy')"><span class="indent-1"></span><span class="tree-icon">📂</span> Guardian Advocacy</div>
+        <div class="tree-item" onclick="navTo('iep-folder')"><span class="indent-2"></span><span class="tree-icon">📂</span> IEP</div>
+        <div class="tree-item" onclick="navTo('prewritten')"><span class="indent-1"></span><span class="tree-icon">📂</span> Pre-Written Materials</div>
+        <div class="tree-item" onclick="navTo('resource-contacts')"><span class="indent-1"></span><span class="tree-icon">📂</span> Resource Contacts</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="tree-item section-header" onclick="navTo('heal'); toggleTree('tree-heal')">
+        <span class="tree-icon">📁</span> HEAL Resources <span class="tree-arrow" id="arrow-heal">›</span>
+      </div>
+      <div class="tree-children" id="tree-heal">
+        <div class="tree-item" onclick="navTo('heal-main')"><span class="indent-1"></span><span class="tree-icon">📂</span> General Resources</div>
+        <div class="tree-item" onclick="navTo('home-hospital')"><span class="indent-1"></span><span class="tree-icon">📂</span> Home Hospital</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="tree-item section-header" onclick="navTo('svp'); toggleTree('tree-svp')">
+        <span class="tree-icon">📁</span> Single Ventricle Program <span class="tree-arrow" id="arrow-svp">›</span>
+      </div>
+      <div class="tree-children" id="tree-svp">
+        <div class="tree-item" onclick="navTo('educational-support')"><span class="indent-1"></span><span class="tree-icon">📂</span> Educational Support</div>
+        <div class="tree-item" onclick="navTo('mental-health-support')"><span class="indent-1"></span><span class="tree-icon">📂</span> Mental Health Support</div>
+        <div class="tree-item" onclick="navTo('teacher-info')"><span class="indent-1"></span><span class="tree-icon">📂</span> Teacher Info</div>
+      </div>
+    </aside>
+    <main class="repo-main" id="repoMain"></main>
+  </div>
+</div>
+
+<footer>
+  <strong>OCHE Resource Repository</strong> · Office of Child Health Equity · Department of Pediatrics · Stanford Medicine
+</footer>
+
+<script>
+let currentLang = 'en';
+let currentPage = 'root';
+
+const T = {
+  en: { heroTitle:"OCHE Resource Repository", heroSub:"Connecting families, providers, and educators to the resources children with complex medical needs deserve — in English, Spanish, and Vietnamese.", browseBtn:"Browse resources →", contactBtn:"Contact us", aboutTitle:"Bridging medicine and education at Stanford", aboutText1:"The Office of Child Health Equity (OCHE) at Stanford Medicine's Department of Pediatrics is committed to ensuring that every child — regardless of medical complexity, language, or background — can access the educational support they need and deserve.", aboutText2:"Our Resource Repository is a centralized hub built for families, clinicians, educators, and discharge planners navigating the intersection of pediatric health and school services.", repoSectionTitle:"Browse by section", repoSectionSub:"Our resources are organized into three main areas. Hover the navigation above to jump directly to any subfolder, or browse below.", card1title:"General", card1desc:"Guardian advocacy guides, IEP resources, pre-written letter templates, and legal contacts for San Mateo County families.", card2title:"HEAL Resources", card2desc:"IEP books, sample letters, accommodation guides, and home hospital materials from the HEAL program.", card3title:"Single Ventricle Program", card3desc:"Condition-specific educational support, mental health resources, and teacher guides — in English, Spanish, and Vietnamese.", contactTitle:"Contact Us", contactDesc:"Have a question or need help finding the right resource? Our team is here to help.", langBtn:"🌐 EN ▾" },
+  es: { heroTitle:"Repositorio de Recursos OCHE", heroSub:"Conectando a familias, proveedores y educadores con los recursos que merecen los niños con necesidades médicas complejas.", browseBtn:"Ver recursos →", contactBtn:"Contáctenos", aboutTitle:"Uniendo medicina y educación en Stanford", aboutText1:"La Oficina de Equidad en Salud Infantil (OCHE) en el Departamento de Pediatría de Stanford Medicine está comprometida a garantizar que cada niño pueda acceder al apoyo educativo que necesita.", aboutText2:"Nuestro Repositorio de Recursos es un centro centralizado para familias, médicos, educadores y planificadores de alta.", repoSectionTitle:"Explorar por sección", repoSectionSub:"Nuestros recursos están organizados en tres áreas principales. Use el menú de navegación para ir directamente a cualquier carpeta.", card1title:"General", card1desc:"Guías de defensa para tutores, recursos de IEP, plantillas de cartas y contactos legales.", card2title:"Recursos HEAL", card2desc:"Libros de IEP, cartas de muestra y guías de acomodación del programa HEAL.", card3title:"Programa Single Ventricle", card3desc:"Apoyo educativo, recursos de salud mental y guías para maestros — en inglés, español y vietnamita.", contactTitle:"Contáctenos", contactDesc:"¿Tiene una pregunta? Nuestro equipo está aquí para ayudar.", langBtn:"🌐 ES ▾" },
+  vi: { heroTitle:"Kho Tài Nguyên OCHE", heroSub:"Kết nối gia đình, nhà cung cấp và nhà giáo dục với các tài nguyên mà trẻ em có nhu cầu y tế phức tạp xứng đáng.", browseBtn:"Xem tài nguyên →", contactBtn:"Liên hệ", aboutTitle:"Kết nối y tế và giáo dục tại Stanford", aboutText1:"Văn phòng Công bằng Sức khỏe Trẻ em (OCHE) tại Khoa Nhi của Stanford Medicine cam kết đảm bảo mọi trẻ em có thể tiếp cận hỗ trợ giáo dục.", aboutText2:"Kho tài nguyên của chúng tôi là trung tâm tập trung cho các gia đình, bác sĩ lâm sàng và nhà giáo dục.", repoSectionTitle:"Duyệt theo phần", repoSectionSub:"Tài nguyên được tổ chức thành ba khu vực. Sử dụng điều hướng ở trên để đến thẳng bất kỳ thư mục nào.", card1title:"Chung", card1desc:"Hướng dẫn vận động, tài nguyên IEP, mẫu thư và danh bạ pháp lý.", card2title:"Tài Nguyên HEAL", card2desc:"Sách IEP, thư mẫu và hướng dẫn từ chương trình HEAL.", card3title:"Chương Trình Single Ventricle", card3desc:"Hỗ trợ giáo dục, tài nguyên sức khỏe tâm thần và hướng dẫn cho giáo viên.", contactTitle:"Liên Hệ", contactDesc:"Có câu hỏi? Nhóm của chúng tôi ở đây để giúp đỡ.", langBtn:"🌐 VI ▾" }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = T[lang];
+  Object.keys(t).forEach(k => { const el = document.getElementById(k); if (el) el.textContent = t[k]; });
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
+  event.target.classList.add('selected');
+  document.getElementById('langMenu').classList.remove('open');
+  if (document.getElementById('screen-repo').classList.contains('active')) navTo(currentPage);
+}
+function toggleLang() { document.getElementById('langMenu').classList.toggle('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.lang-wrapper')) document.getElementById('langMenu').classList.remove('open'); });
+function scrollToContact() { showScreen('home'); setTimeout(() => document.getElementById('contact-section').scrollIntoView({behavior:'smooth'}), 100); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-home-btn, .nav-item-btn').forEach(b => b.classList.remove('active'));
+  if (id === 'home') document.getElementById('nl-home').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleTree(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById('arrow-' + id.replace('tree-',''));
+  el.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open');
+}
+
+const FILES = {
+  'heal-main': [
+    {name:'AT - Myths and Facts Surrounding Assistive Technology Devices',type:'pdf',langs:['en']},
+    {name:'Attendance for Home Hospital Instruction — CA Dept of Education',type:'pdf',langs:['en']},
+    {name:'California Special Education Guide Letter Sample',type:'pdf',langs:['en']},
+    {name:'English IEP Request (Fillable)',type:'pdf',langs:['en']},
+    {name:'HEAL Program IEP Book',type:'pdf',langs:['en']},
+    {name:'IEP Sample Letter',type:'pdf',langs:['en']},
+    {name:'IEP Sample Letter',type:'pdf',langs:['es']},
+    {name:'Legal Advocates',type:'doc',langs:['en']},
+    {name:'LPCH IEP Book Final',type:'pdf',langs:['en']},
+    {name:'Partial Day with Home Instruction Letter',type:'doc',langs:['en']},
+    {name:'Sample Accommodations for Anxious Kids',type:'doc',langs:['en']},
+    {name:'Spanish IEP Request (Fillable)',type:'pdf',langs:['es']},
+    {name:'Speech-Language IEP Accommodations',type:'pdf',langs:['en']},
+  ],
+  'home-hospital': [
+    {name:'Attendance for Home Hospital Instruction — CA Dept of Education',type:'pdf',langs:['en']},
+    {name:'Full Home Hospital Letter (3-13-13)',type:'pdf',langs:['en']},
+    {name:'Full Home Hospital Letter (4-4-16)',type:'pdf',langs:['en']},
+    {name:'Home Hospital Letter with Partial Attendance',type:'doc',langs:['en']},
+    {name:'Home Hospital',type:'doc',langs:['en']},
+    {name:'HomeHospital CalEdFacts',type:'doc',langs:['en']},
+    {name:'Independent Study',type:'doc',langs:['en']},
+    {name:'Medical Educational Placements',type:'pdf',langs:['en']},
+    {name:'State Regulation',type:'pdf',langs:['en']},
+  ],
+  'educational-support': [
+    {name:'Special Education in the School System',type:'pdf',langs:['en']},
+    {name:'Special Education in the School System',type:'pdf',langs:['es']},
+    {name:'Special Education in the School System',type:'pdf',langs:['vi']},
+  ],
+  'mental-health-support': [
+    {name:"Supporting Your Child's Mental Health in School",type:'pdf',langs:['en']},
+    {name:"Supporting Your Child's Mental Health in School",type:'pdf',langs:['es']},
+    {name:"Supporting Your Child's Mental Health in School",type:'pdf',langs:['vi']},
+    {name:'Mental Health Support in the Public School System',type:'doc',langs:['en']},
+  ],
+  'teacher-info': [
+    {name:'Going to Elementary School with a Heart Problem',type:'pdf',langs:['en']},
+    {name:'Going to Elementary School with a Heart Problem',type:'pdf',langs:['es']},
+    {name:'Going to High School with a Heart Problem',type:'pdf',langs:['en']},
+    {name:'Going to High School with a Heart Problem',type:'pdf',langs:['es']},
+    {name:'Going to Middle School with a Heart Problem',type:'pdf',langs:['en']},
+    {name:'Going to Middle School with a Heart Problem',type:'pdf',langs:['es']},
+    {name:'Going to Preschool with a Heart Problem',type:'pdf',langs:['en']},
+    {name:'Going to Preschool with a Heart Problem',type:'pdf',langs:['es']},
+  ],
+  'iep-folder': [
+    {name:'Special Education and Your Rights',type:'pdf',langs:['en']},
+    {name:'Special Education and Your Rights',type:'pdf',langs:['es']},
+    {name:'2022 Procedural Safeguards',type:'pdf',langs:['en']},
+  ],
+  'prewritten': [
+    {name:'Guardian Request: Special Education Assessment Request Letter',type:'pdf',langs:['en','es']},
+    {name:'MD Request: Special Education Assessment Request Letter',type:'pdf',langs:['en']},
+  ],
+  'resource-contacts': [
+    {name:'IEE Approved Providers — San Mateo County',type:'doc',langs:['en']},
+    {name:'Legal Resources',type:'doc',langs:['en']},
+  ],
+};
+
+const PAGES = {
+  root:{title:'OCHE Resource Repository',desc:'Browse resources by section below.',breadcrumb:[],
+    content:()=>`<div class="section-label">Sections</div><div class="folder-grid">
+      <div class="folder-card" onclick="navTo('general')"><span style="font-size:22px">📁</span><div><div class="folder-name">General</div><div class="folder-count">Guardian Advocacy · Pre-Written · Contacts</div></div></div>
+      <div class="folder-card" onclick="navTo('heal')"><span style="font-size:22px">📁</span><div><div class="folder-name">HEAL Resources</div><div class="folder-count">General Resources · Home Hospital</div></div></div>
+      <div class="folder-card" onclick="navTo('svp')"><span style="font-size:22px">📁</span><div><div class="folder-name">Single Ventricle Program</div><div class="folder-count">Educational · Mental Health · Teacher Info</div></div></div>
+    </div>`},
+  general:{title:'General',desc:'Guardian advocacy guides, pre-written materials, and resource contacts.',breadcrumb:[{label:'Repository',page:'root'}],
+    content:()=>`<div class="section-label">Folders</div><div class="folder-grid">
+      <div class="folder-card" onclick="navTo('guardian-advocacy')"><span style="font-size:22px">📂</span><div><div class="folder-name">Guardian Advocacy</div><div class="folder-count">Includes IEP subfolder</div></div></div>
+      <div class="folder-card" onclick="navTo('prewritten')"><span style="font-size:22px">📂</span><div><div class="folder-name">Pre-Written Materials</div><div class="folder-count">2 documents</div></div></div>
+      <div class="folder-card" onclick="navTo('resource-contacts')"><span style="font-size:22px">📂</span><div><div class="folder-name">Resource Contacts</div><div class="folder-count">2 documents</div></div></div>
+    </div>`},
+  'guardian-advocacy':{title:'Guardian Advocacy',desc:'Resources to help guardians advocate for their children.',breadcrumb:[{label:'Repository',page:'root'},{label:'General',page:'general'}],
+    content:()=>`<div class="section-label">Subfolders</div><div class="folder-grid">
+      <div class="folder-card" onclick="navTo('iep-folder')"><span style="font-size:22px">📂</span><div><div class="folder-name">IEP</div><div class="folder-count">Special Ed Rights · Procedural Safeguards</div></div></div>
+    </div>`},
+  'iep-folder':{title:'IEP',desc:'Key documents about IEP rights and procedural safeguards.',breadcrumb:[{label:'Repository',page:'root'},{label:'General',page:'general'},{label:'Guardian Advocacy',page:'guardian-advocacy'}],content:()=>renderFiles('iep-folder')},
+  prewritten:{title:'Pre-Written Materials',desc:'Ready-to-use letter templates for families and medical providers.',breadcrumb:[{label:'Repository',page:'root'},{label:'General',page:'general'}],content:()=>renderFiles('prewritten')},
+  'resource-contacts':{title:'Resource Contacts',desc:'Key contacts and legal resources for families.',breadcrumb:[{label:'Repository',page:'root'},{label:'General',page:'general'}],content:()=>renderFiles('resource-contacts')},
+  heal:{title:'HEAL Resources',desc:'Resources from the Health and Education Access Lab program.',breadcrumb:[{label:'Repository',page:'root'}],
+    content:()=>`<div class="section-label">Folders</div><div class="folder-grid">
+      <div class="folder-card" onclick="navTo('heal-main')"><span style="font-size:22px">📂</span><div><div class="folder-name">General Resources</div><div class="folder-count">IEP books, letters, guides</div></div></div>
+      <div class="folder-card" onclick="navTo('home-hospital')"><span style="font-size:22px">📂</span><div><div class="folder-name">Home Hospital</div><div class="folder-count">Letters, placement guides, regulations</div></div></div>
+    </div>`},
+  'heal-main':{title:'HEAL — General Resources',desc:'IEP books, sample letters, legal advocates, and accommodation guides.',breadcrumb:[{label:'Repository',page:'root'},{label:'HEAL Resources',page:'heal'}],content:()=>renderFiles('heal-main')},
+  'home-hospital':{title:'Home Hospital',desc:'Letters, guides, and state regulations for home hospital instruction.',breadcrumb:[{label:'Repository',page:'root'},{label:'HEAL Resources',page:'heal'}],content:()=>renderFiles('home-hospital')},
+  svp:{title:'Single Ventricle Program',desc:'Educational, mental health, and teacher resources.',breadcrumb:[{label:'Repository',page:'root'}],
+    content:()=>`<div class="section-label">Folders</div><div class="folder-grid">
+      <div class="folder-card" onclick="navTo('educational-support')"><span style="font-size:22px">📂</span><div><div class="folder-name">Educational Support</div><div class="folder-count">Special Education in School System (EN · ES · VI)</div></div></div>
+      <div class="folder-card" onclick="navTo('mental-health-support')"><span style="font-size:22px">📂</span><div><div class="folder-name">Mental Health Support</div><div class="folder-count">Supporting Your Child's Mental Health (EN · ES · VI)</div></div></div>
+      <div class="folder-card" onclick="navTo('teacher-info')"><span style="font-size:22px">📂</span><div><div class="folder-name">Teacher Info</div><div class="folder-count">Going to School with a Heart Problem (EN · ES)</div></div></div>
+    </div>`},
+  'educational-support':{title:'Educational Support',desc:'Special education guides for the Single Ventricle Program.',breadcrumb:[{label:'Repository',page:'root'},{label:'Single Ventricle Program',page:'svp'}],content:()=>renderFiles('educational-support')},
+  'mental-health-support':{title:'Mental Health Support',desc:'Mental health resources for families.',breadcrumb:[{label:'Repository',page:'root'},{label:'Single Ventricle Program',page:'svp'}],content:()=>renderFiles('mental-health-support')},
+  'teacher-info':{title:'Teacher Info',desc:'Grade-specific guides for teachers supporting children with heart conditions.',breadcrumb:[{label:'Repository',page:'root'},{label:'Single Ventricle Program',page:'svp'}],content:()=>renderFiles('teacher-info')},
+};
+
+function renderFiles(key) {
+  let files = FILES[key] || [];
+  if (currentLang !== 'en') files = files.filter(f => f.langs.includes(currentLang));
+  if (!files.length) return `<div style="color:var(--gray-500);font-size:14px;padding:1rem 0;">No documents available in the selected language for this folder.</div>`;
+  return `<div class="file-grid">${files.map(f=>`
+    <div class="file-card">
+      <span class="file-type">${f.type==='pdf'?'📄':'📝'}</span>
+      <div class="file-name">${f.name}</div>
+      <div class="file-meta"><span class="lang-tag ${f.langs[0]}">${f.langs[0].toUpperCase()}</span><span>${f.type.toUpperCase()}</span></div>
+    </div>`).join('')}</div>`;
+}
+
+function navTo(page) {
+  currentPage = page;
+  const p = PAGES[page];
+  if (!p) return;
+  const bcHtml = [...p.breadcrumb.map(b=>`<span onclick="navTo('${b.page}')">${b.label}</span><span class="breadcrumb-sep">›</span>`),`<span style="color:var(--black);font-weight:500">${p.title}</span>`].join('');
+  document.getElementById('repoMain').innerHTML = `
+    <div class="repo-header">
+      <div class="breadcrumb">${bcHtml}</div>
+      <div class="repo-title">${p.title}</div>
+      ${p.desc?`<div class="repo-desc">${p.desc}</div>`:''}
+    </div>${p.content()}`;
+  const treeMap={general:'general','guardian-advocacy':'general','iep-folder':'general',prewritten:'general','resource-contacts':'general',heal:'heal','heal-main':'heal','home-hospital':'heal',svp:'svp','educational-support':'svp','mental-health-support':'svp','teacher-info':'svp'};
+  const section=treeMap[page];
+  if(section){const t=document.getElementById('tree-'+section);const a=document.getElementById('arrow-'+section);if(t&&!t.classList.contains('open')){t.classList.add('open');if(a)a.classList.add('open');}}
+}
+navTo('root');
+</script>
+</body>
+</html>
