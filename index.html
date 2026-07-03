@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>OCHE Resource Repository — Stanford Medicine</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
@@ -20,11 +21,11 @@ body { font-family: 'Source Sans 3', sans-serif; color: var(--black); background
 /* ── TOP BAR ── */
 .top-bar {
   background: var(--black); padding: 0 2rem;
-  display: flex; align-items: center; justify-content: space-between; height: 42px;
+  display: flex; align-items: center; justify-content: space-between; height: 64px;
 }
 .top-bar-left { display: flex; align-items: center; gap: 6px; }
 .top-bar-logo { cursor: pointer; }
-.top-bar-logo img { height: 26px; width: auto; display: block; }
+.top-bar-logo img { height: 46px; width: auto; display: block; }
 .top-bar-right { display: flex; align-items: center; gap: 8px; }
 .lang-wrapper { position: relative; }
 .lang-btn {
@@ -224,12 +225,62 @@ nav {
 footer { background: var(--black); color: rgba(255,255,255,0.5); text-align: center; padding: 1.25rem 2rem; font-size: 12px; border-top: 3px solid var(--cardinal-dark); }
 footer strong { color: rgba(255,255,255,0.85); }
 
+/* ── ACCESSIBILITY ── */
+:focus-visible { outline: 3px solid var(--cardinal); outline-offset: 2px; border-radius: 3px; }
+.top-bar :focus-visible, nav :focus-visible, .hero :focus-visible { outline-color: #fff; }
+
+/* ── CARD ANIMATION ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.file-card, .folder-card { animation: fadeUp 0.35s ease both; }
+.file-card:nth-child(2), .folder-card:nth-child(2) { animation-delay: 0.05s; }
+.file-card:nth-child(3), .folder-card:nth-child(3) { animation-delay: 0.1s; }
+.file-card:nth-child(4), .folder-card:nth-child(4) { animation-delay: 0.15s; }
+.file-card:nth-child(n+5) { animation-delay: 0.2s; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .file-card, .folder-card { animation: none; }
+}
+
+/* ── SIDEBAR SEARCH ── */
+.sidebar-search { padding: 0 1.25rem 1rem; }
+.sidebar-search input {
+  width: 100%; font-size: 13px; padding: 8px 12px; border-radius: 100px;
+  border: 1px solid var(--gray-200); background: var(--gray-100); color: var(--black);
+  font-family: 'Source Sans 3', sans-serif; outline: none; transition: border-color 0.15s, background 0.15s;
+}
+.sidebar-search input:focus { border-color: var(--cardinal); background: var(--white); }
+.search-folder-label { font-size: 11px; color: var(--gray-500); font-weight: 600; }
+.search-folder-label span { color: var(--cardinal); cursor: pointer; }
+.search-folder-label span:hover { text-decoration: underline; }
+
+/* ── MOBILE MENU ── */
+.mobile-menu-btn {
+  display: none; background: none; border: 1px solid rgba(255,255,255,0.3); border-radius: var(--radius-sm);
+  color: #fff; font-size: 18px; padding: 4px 10px; cursor: pointer; line-height: 1;
+}
+.mobile-menu {
+  display: none; background: var(--dark-gray); padding: 8px 0;
+  position: sticky; top: 0; z-index: 300; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.mobile-menu.open { display: block; }
+.mobile-menu-link {
+  display: block; width: 100%; text-align: left; padding: 12px 1.5rem;
+  background: none; border: none; color: rgba(255,255,255,0.85); cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif; font-size: 15px; font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.mobile-menu-link:last-child { border-bottom: none; }
+.mobile-menu-link:hover, .mobile-menu-link:active { background: var(--cardinal); color: #fff; }
+.mobile-menu-sub { padding-left: 2.5rem; font-size: 14px; color: rgba(255,255,255,0.6); }
+
 @media (max-width: 720px) {
   .about-split, .contact-grid { grid-template-columns: 1fr; }
   .repo-layout { flex-direction: column; }
   .sidebar { width: 100%; height: auto; position: relative; top: 0; }
   .top-bar { padding: 0 1rem; }
+  .top-bar-logo img { height: 38px; }
   nav { display: none; }
+  .mobile-menu-btn { display: inline-block; }
   .hero { height: auto; padding: 3rem 1.25rem; }
   .hero-content { padding: 0; max-width: 100%; }
 }
@@ -245,6 +296,7 @@ footer strong { color: rgba(255,255,255,0.85); }
     </div>
   </div>
   <div class="top-bar-right">
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false" id="mobileMenuBtn">☰</button>
     <div class="lang-wrapper">
       <button class="lang-btn" onclick="toggleLang()" id="langBtn">🌐 EN ▾</button>
       <div class="lang-dropdown" id="langMenu">
@@ -335,6 +387,16 @@ footer strong { color: rgba(255,255,255,0.85); }
   </div>
 </nav>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-link" onclick="mobileGo('home')">🏠 Home</button>
+  <button class="mobile-menu-link" onclick="mobileGo('repo','root')">📁 Browse All Resources</button>
+  <button class="mobile-menu-link mobile-menu-sub" onclick="mobileGo('repo','general')">General</button>
+  <button class="mobile-menu-link mobile-menu-sub" onclick="mobileGo('repo','heal')">HEAL Resources</button>
+  <button class="mobile-menu-link mobile-menu-sub" onclick="mobileGo('repo','svp')">Single Ventricle Program</button>
+  <button class="mobile-menu-link" onclick="toggleMobileMenu(); scrollToContact()">✉️ Contact us</button>
+</div>
+
 <!-- ── HOME ── -->
 <div id="screen-home" class="screen active">
 
@@ -398,6 +460,9 @@ footer strong { color: rgba(255,255,255,0.85); }
   <div class="repo-layout">
     <aside class="sidebar">
       <div class="sidebar-title">Repository</div>
+      <div class="sidebar-search">
+        <input type="search" id="repoSearch" placeholder="🔍 Search documents…" oninput="searchRepo(this.value)" aria-label="Search documents" />
+      </div>
       <div class="tree-item section-header" onclick="navTo('general'); toggleTree('tree-general')">
         <span class="tree-icon">📁</span> General <span class="tree-arrow" id="arrow-general">›</span>
       </div>
@@ -582,6 +647,51 @@ function renderFiles(key) {
       <div class="file-name">${f.name}</div>
       <div class="file-meta"><span class="lang-tag ${f.langs[0]}">${f.langs[0].toUpperCase()}</span><span>${f.type.toUpperCase()}</span></div>
     </div>`).join('')}</div>`;
+}
+
+// Mobile menu
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('mobileMenuBtn');
+  const open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(open));
+  btn.textContent = open ? '✕' : '☰';
+}
+function mobileGo(screen, page) {
+  toggleMobileMenu();
+  showScreen(screen);
+  if (page) navTo(page);
+}
+
+// Repository search across all folders
+const FOLDER_TITLES = {'heal-main':'HEAL — General Resources','home-hospital':'Home Hospital','educational-support':'Educational Support','mental-health-support':'Mental Health Support','teacher-info':'Teacher Info','iep-folder':'IEP','prewritten':'Pre-Written Materials','resource-contacts':'Resource Contacts'};
+function searchRepo(q) {
+  q = q.trim().toLowerCase();
+  if (!q) { navTo(currentPage); return; }
+  const results = [];
+  Object.keys(FILES).forEach(folder => {
+    FILES[folder].forEach(f => {
+      if (f.name.toLowerCase().includes(q)) results.push({...f, folder});
+    });
+  });
+  const body = results.length
+    ? `<div class="file-grid">${results.map(f=>`
+        <div class="file-card">
+          <span class="file-type">${f.type==='pdf'?'📄':'📝'}</span>
+          <div class="file-name">${f.name}</div>
+          <div class="file-meta"><span class="lang-tag ${f.langs[0]}">${f.langs[0].toUpperCase()}</span><span>${f.type.toUpperCase()}</span></div>
+          <div class="search-folder-label">in <span onclick="clearSearch('${f.folder}')">${FOLDER_TITLES[f.folder]||f.folder}</span></div>
+        </div>`).join('')}</div>`
+    : `<div style="color:var(--gray-500);font-size:14px;padding:1rem 0;">No documents match "<strong>${q.replace(/</g,'&lt;')}</strong>".</div>`;
+  document.getElementById('repoMain').innerHTML = `
+    <div class="repo-header">
+      <div class="repo-title">Search results</div>
+      <div class="repo-desc">${results.length} document${results.length===1?'':'s'} found</div>
+    </div>${body}`;
+}
+function clearSearch(folder) {
+  document.getElementById('repoSearch').value = '';
+  navTo(folder);
 }
 
 function navTo(page) {
